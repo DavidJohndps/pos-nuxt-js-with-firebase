@@ -1,5 +1,5 @@
 <template>
-  <div v-if="Cart.length">
+  <div v-if="Cart">
     <v-simple-table dark>
       <template v-slot:default>
         <thead>
@@ -37,9 +37,12 @@
               </v-btn>
             </td>
           </tr>
-          <tr>
+          <tr v-if="Cart.length">
             <td class="text-right" colspan="4">Total:</td>
             <td>{{ CartTotal }}</td>
+          </tr>
+          <tr v-if="!Cart.length">
+            <td class="text-center" colspan="6">No Items in Cart</td>
           </tr>
         </tbody>
       </template>
@@ -60,9 +63,12 @@ export default {
   computed: {
     Cart() {
       return this.$store.getters.getCartItems.map((item) => {
-        if(item.qty < item.discount1Qty) item.total = item.qty * item.profit * item.base_price
-        if(item.qty >= item.discount1Qty && item.qty <= item.discount2Qty) item.total = item.qty * item.discount1 * item.base_price
-        if(item.qty >= item.discount2Qty) item.total = item.qty * item.discount2 * item.base_price
+        if (item.qty < item.discount1Qty)
+          item.total = item.qty * ((100 + item.profit)/100) * item.base_price
+        if (item.qty >= item.discount1Qty && item.qty <= item.discount2Qty)
+          item.total = item.qty * ((100 + item.discount1)/100) * item.base_price
+        if (item.qty >= item.discount2Qty)
+          item.total = item.qty * ((100 + item.discount1)/100) * item.base_price
         return item
       })
     },
@@ -81,8 +87,9 @@ export default {
     },
     Pay(items, total) {
       console.log(total)
-      if(confirm('Are these items are correct ?')) this.$store.dispatch('Transactions', {items: items, total: total})
-    }
+      if (confirm('Are these items are correct ?'))
+        this.$store.dispatch('Transactions', { items: items, total: total })
+    },
   },
 }
 </script>

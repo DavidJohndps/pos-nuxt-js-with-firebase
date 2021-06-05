@@ -49,14 +49,10 @@ export const mutations = {
       : payload.qty
       ? (state.cartItem[index].qty = parseInt(payload.qty))
       : (state.cartItem[index].qty += 1)
-
-    console.log(state.cartItem)
   },
   removeCartItem(state, payload) {
     // console.log(payload)
-    state.cartItem = state.cartItem.filter(
-      (product) => product.id === payload.product.id
-    )
+    state.cartItem = state.cartItem.filter( product => {product.id === payload.product.id})
   },
   addTransactions: (state, payload) => state.transactions.push(payload),
   emptyTransaction: (state) => (state.transactions = []),
