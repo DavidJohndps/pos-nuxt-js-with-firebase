@@ -73,9 +73,9 @@ export const actions = {
     }
   },
 
-  async Search({state, commit}) {
+  async Search({state, commit, dispatch}) {
     try {
-      await this.$fire.firestore.collection('products').where("nameIndex","array-contains-any", state.query).get()
+      state.query ? await this.$fire.firestore.collection('products').where("nameIndex","array-contains", state.query).get()
       .then(res => {
         res.forEach(doc => {
           let data = doc.data()
@@ -85,7 +85,7 @@ export const actions = {
             name: data.name,
             nameIndex: data.nameIndex,
             base_price: data.base_price,
-            profit: data.product,
+            profit: data.profit,
             discount1: data.discount1,
             discount1Qty: data.discount1Qty,
             discount2: data.discount2,
@@ -93,7 +93,7 @@ export const actions = {
             stock: data.stock
           });
         })
-      })
+      }) : dispatch('getProducts')
     } catch (error) {
       console.log(error);
     }
