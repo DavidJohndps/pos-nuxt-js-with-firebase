@@ -66,9 +66,9 @@ export default {
         if (item.qty < item.discount1Qty)
           item.total = item.qty * ((100 + item.profit)/100) * item.base_price
         if (item.qty >= item.discount1Qty && item.qty <= item.discount2Qty)
-          item.total = item.qty * ((100 + item.discount1)/100) * item.base_price
+          item.total = item.qty * ((100 - item.discount1)/100) * item.base_price
         if (item.qty >= item.discount2Qty)
-          item.total = item.qty * ((100 + item.discount1)/100) * item.base_price
+          item.total = item.qty * ((100 - item.discount1)/100) * item.base_price
         return item
       })
     },
