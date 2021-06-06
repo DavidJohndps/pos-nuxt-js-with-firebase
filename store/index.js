@@ -9,6 +9,7 @@ export const state = () => ({
     email: '',
     name: '',
   },
+  query: '',
   transactions: [],
   product: {},
   products: [],
@@ -27,6 +28,7 @@ export const mutations = {
   setActiveLink: (state, payload) => (state.activeLink = payload),
   User: (state, payload) =>
     (state.user = { email: payload.email, name: payload.name }),
+  updateQuery: (state,payload) => state.query = payload,
   addProducts: (state, payload) => state.products.push(payload),
   emptyProducts: (state) => (state.products = []),
   setProduct: (state, payload) => (state.product = payload),
@@ -71,19 +73,46 @@ export const actions = {
     }
   },
 
+  async Search({state, commit}) {
+    try {
+      await this.$fire.firestore.collection('products').where("nameIndex","array-contains-any", state.query).get()
+      .then(res => {
+        res.forEach(doc => {
+          let data = doc.data()
+          commit('emptyProducts')
+          commit('addProducts',{
+            id: doc.id,
+            name: data.name,
+            nameIndex: data.nameIndex,
+            base_price: data.base_price,
+            profit: data.product,
+            discount1: data.discount1,
+            discount1Qty: data.discount1Qty,
+            discount2: data.discount2,
+            discount2Qty: data.discount2Qty,
+            stock: data.stock
+          });
+        })
+      })
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
   async getProducts({ commit }) {
     commit('emptyProducts')
     try {
       await this.$fire.firestore
         .collection('products')
         .limit(9)
+        .orderBy("timestamps", "desc")
         .get()
         .then((res) => {
           console.log(res)
           // const data = res.data();
           res.forEach((doc) => {
             let data = doc.data()
-            // console.log(data.timestamps.updatedAt.toDate());
+            // console.log(new Date(data.timestamps.updatedAt.toMillis()));
             commit('addProducts', {
               id: doc.id,
               name: data.name,
@@ -97,8 +126,8 @@ export const actions = {
               stock: data.stock,
               note: data.note,
               timestamps: {
-                createdAt: new Date(data.timestamps.createdAt.toDate()),
-                updatedAt: new Date(data.timestamps.updatedAt.toDate()),
+                createdAt: new Date(data.timestamps.createdAt.toMillis()),
+                updatedAt: new Date(data.timestamps.updatedAt.toMillis()),
               },
             })
           })
@@ -133,7 +162,8 @@ export const actions = {
       console.log(error)
     }
   },
-  deleteProduct: async ({ commit }, id) => {
+
+  deleteProduct: async ({ dispatch }, id) => {
     // console.log(id)
     try {
       await this.$fire.firestore.collection('products').doc(id).delete()
@@ -142,12 +172,14 @@ export const actions = {
       console.log(error)
     }
   },
+
   async getTransactions({ commit }) {
     commit('emptyTransaction')
     try {
       await this.$fire.firestore
-        .collection('transaction')
+        .collection('transactions')
         .limit(9)
+        .orderBy("timestamps","desc")
         .get()
         .then((res) => {
           res.forEach((doc) => {
@@ -179,7 +211,7 @@ export const actions = {
           stock: itemQty,
         })
       })
-      batch.set(this.$fire.firestore.collection('transaction').doc(), {
+      batch.set(this.$fire.firestore.collection('transactions').doc(), {
         items: payload.items,
         total: payload.total,
         timestamps: {
