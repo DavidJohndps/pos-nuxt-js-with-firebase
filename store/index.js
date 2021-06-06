@@ -74,12 +74,13 @@ export const actions = {
   },
 
   async Search({state, commit, dispatch}) {
+    commit('emptyProducts')
     try {
-      state.query ? await this.$fire.firestore.collection('products').where("nameIndex","array-contains", state.query).get()
+      state.query ? await this.$fire.firestore.collection('products').where("nameIndex","array-contains", state.query)
+      .get()
       .then(res => {
         res.forEach(doc => {
-          let data = doc.data()
-          commit('emptyProducts')
+          let data = doc.data()          
           commit('addProducts',{
             id: doc.id,
             name: data.name,
