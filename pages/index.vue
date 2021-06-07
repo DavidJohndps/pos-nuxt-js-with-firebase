@@ -1,5 +1,12 @@
 <template>
-  <v-row>
+  <v-row justify="center">
+    <v-col cols="9">
+      <v-text-field clearable @change="updateQuery">
+        <v-btn rounded slot="prepend" color="primary" @click="Search">
+          <v-icon class="material-icons">search</v-icon>
+        </v-btn>
+      </v-text-field>
+    </v-col>
     <v-col v-for="product in Products" :key="product.id" cols="12" md="4">
       <v-card>
         <v-card-title>{{ product.name }}</v-card-title>
@@ -47,6 +54,13 @@ export default {
           discount2Qty: product.discount2Qty
         }
       })
+    },
+    updateQuery(e) {
+      // console.log(e)
+      this.$store.commit('updateQuery',e)
+    },
+    Search() {
+      this.$store.dispatch('Search')
     }
   }
 }

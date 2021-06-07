@@ -32,14 +32,19 @@
             <td>{{ item.base_price }}</td>
             <td>{{ item.total }}</td>
             <td>
-              <v-btn rounded outlined icon @click="Remove(item.id)">
-                <i class="material-icons">remove_shopping_cart</i>
+              <v-btn fab small color="warning" @click="Remove(item.id)">
+                <v-icon class="material-icons">remove_shopping_cart</v-icon>
               </v-btn>
             </td>
           </tr>
           <tr v-if="Cart.length">
             <td class="text-right" colspan="4">Total:</td>
             <td>{{ CartTotal }}</td>
+            <td>
+              <v-btn fab small color="success" @click="Pay(Cart, CartTotal)">
+                <v-icon class="material-icons">payments</v-icon>
+              </v-btn>
+            </td>
           </tr>
           <tr v-if="!Cart.length">
             <td class="text-center" colspan="6">No Items in Cart</td>
@@ -47,9 +52,6 @@
         </tbody>
       </template>
     </v-simple-table>
-    <v-btn rounded icon outlined @click="Pay(Cart, CartTotal)">
-      <i class="material-icons">payments</i>
-    </v-btn>
   </div>
 </template>
 
@@ -64,11 +66,13 @@ export default {
     Cart() {
       return this.$store.getters.getCartItems.map((item) => {
         if (item.qty < item.discount1Qty)
-          item.total = item.qty * ((100 + item.profit)/100) * item.base_price
+          item.total = item.qty * ((100 + item.profit) / 100) * item.base_price
         if (item.qty >= item.discount1Qty && item.qty <= item.discount2Qty)
-          item.total = item.qty * ((100 - item.discount1)/100) * item.base_price
+          item.total =
+            item.qty * ((100 - item.discount1) / 100) * item.base_price
         if (item.qty >= item.discount2Qty)
-          item.total = item.qty * ((100 - item.discount1)/100) * item.base_price
+          item.total =
+            item.qty * ((100 - item.discount1) / 100) * item.base_price
         return item
       })
     },
